@@ -11,6 +11,7 @@
             padding: 20px;
             color: #333;
         }
+
         #video-container {
             position: relative;
             max-width: 800px;
@@ -20,6 +21,32 @@
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
+
+        /* When the container is fullscreen, ensure overlay and elements are still visible */
+        #video-container:fullscreen #interactive-overlay {
+            display: flex;
+        }
+
+        #interactive-video {
+            display: block;
+            width: 100%;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 11;
+            font-size: 0.9em;
+        }
+
         #interactive-overlay {
             position: absolute;
             top: 0;
@@ -33,6 +60,7 @@
             align-items: center;
             z-index: 10;
         }
+
         .slide {
             background: white;
             padding: 30px;
@@ -41,24 +69,29 @@
             max-width: 90%;
             width: 100%;
         }
+
         #question-slide h2,
         #feedback-slide h2 {
             margin-top: 0;
             font-size: 1.5em;
             color: #333;
         }
+
         .choice-container {
             display: flex;
             align-items: center;
             margin: 15px 0;
         }
+
         .choice-container input[type="radio"] {
             margin-right: 10px;
         }
+
         .choice-container label {
             font-size: 1em;
             cursor: pointer;
         }
+
         #submit-btn, #resume-btn {
             margin-top: 20px;
             padding: 12px 24px;
@@ -69,19 +102,14 @@
             cursor: pointer;
             font-size: 1em;
         }
+
         #submit-btn:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
         }
+
         #feedback-slide p {
             margin: 10px 0;
-        }
-
-        /* Optional: a bit of polish on the video area */
-        #interactive-video {
-            display: block;
-            width: 100%;
-            border-bottom: 1px solid #ddd;
         }
     </style>
 </head>
@@ -89,7 +117,11 @@
     <div id="video-container">
         <video id="interactive-video" controls>
             <source src="Medanta1.mp4" type="video/mp4">
+            Your browser does not support the video tag.
         </video>
+        
+        <!-- Custom fullscreen button -->
+        <button id="fullscreen-btn">Go Fullscreen</button>
 
         <div id="interactive-overlay">
             <div id="question-slide" class="slide">
@@ -112,6 +144,7 @@
             constructor() {
                 // Elements
                 this.video = document.getElementById('interactive-video');
+                this.videoContainer = document.getElementById('video-container');
                 this.interactiveOverlay = document.getElementById('interactive-overlay');
                 this.questionSlide = document.getElementById('question-slide');
                 this.feedbackSlide = document.getElementById('feedback-slide');
@@ -121,6 +154,7 @@
                 this.questionTitle = document.getElementById('question-title');
                 this.correctAnswerText = document.getElementById('correct-answer-text');
                 this.explanationText = document.getElementById('explanation-text');
+                this.fullscreenBtn = document.getElementById('fullscreen-btn');
 
                 // Interactive points
                 this.interactivePoints = [
@@ -131,22 +165,22 @@
                             { 
                                 text: "To systematically evaluate a patient's physical, mental, and social well-being", 
                                 correct: true, 
-                                explanation: "Health assessment involves a structured approach to understanding the overall health of a patient, considering physical, mental, and social factors to provide a holistic view of their well-being." 
+                                explanation: "Health assessment involves a structured approach to understanding the overall health of a patient, considering physical, mental, and social factors." 
                             },
                             { 
                                 text: "To diagnose specific diseases", 
                                 correct: false, 
-                                explanation: "To systematically evaluate a patient's physical, mental, and social well-being" 
+                                explanation: "The primary purpose is broader than just diagnosis." 
                             },
                             { 
                                 text: "To focus only on physical fitness", 
                                 correct: false, 
-                                explanation: "To systematically evaluate a patient's physical, mental, and social well-being" 
+                                explanation: "Health assessment looks at mental and social factors too, not just physical fitness." 
                             },
                             { 
                                 text: "To collect data for research studies", 
                                 correct: false, 
-                                explanation: "To systematically evaluate a patient's physical, mental, and social well-being" 
+                                explanation: "While data can be used for research, the main goal is understanding the patient's overall health." 
                             }
                         ],
                         shown: false
@@ -158,6 +192,9 @@
 
                 this.submitBtn.onclick = this.handleSubmit.bind(this);
                 this.resumeBtn.onclick = this.resumeVideo.bind(this);
+
+                // Fullscreen button event
+                this.fullscreenBtn.addEventListener('click', this.goFullscreen.bind(this));
             }
 
             checkInteractivePoint() {
@@ -223,6 +260,18 @@
                 this.interactiveOverlay.style.display = 'none';
                 this.video.currentTime += 0.6;
                 this.video.play();
+            }
+
+            goFullscreen() {
+                if (this.videoContainer.requestFullscreen) {
+                    this.videoContainer.requestFullscreen();
+                } else if (this.videoContainer.webkitRequestFullscreen) { // Safari
+                    this.videoContainer.webkitRequestFullscreen();
+                } else if (this.videoContainer.mozRequestFullScreen) { // Firefox
+                    this.videoContainer.mozRequestFullScreen();
+                } else if (this.videoContainer.msRequestFullscreen) { // IE/Edge
+                    this.videoContainer.msRequestFullscreen();
+                }
             }
         }
 
