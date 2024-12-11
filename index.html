@@ -22,7 +22,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        /* When the container is fullscreen, ensure overlay and elements are still visible */
+        /* When the container is fullscreen, overlay can still display */
         #video-container:fullscreen #interactive-overlay {
             display: flex;
         }
@@ -31,20 +31,6 @@
             display: block;
             width: 100%;
             border-bottom: 1px solid #ddd;
-        }
-
-        #fullscreen-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 8px 12px;
-            background: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 11;
-            font-size: 0.9em;
         }
 
         #interactive-overlay {
@@ -119,9 +105,6 @@
             <source src="Medanta1.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
-        
-        <!-- Custom fullscreen button -->
-        <button id="fullscreen-btn">Go Fullscreen</button>
 
         <div id="interactive-overlay">
             <div id="question-slide" class="slide">
@@ -154,9 +137,8 @@
                 this.questionTitle = document.getElementById('question-title');
                 this.correctAnswerText = document.getElementById('correct-answer-text');
                 this.explanationText = document.getElementById('explanation-text');
-                this.fullscreenBtn = document.getElementById('fullscreen-btn');
 
-                // Interactive points
+                // Interactive point
                 this.interactivePoints = [
                     {
                         timestamp: 153,
@@ -165,22 +147,22 @@
                             { 
                                 text: "To systematically evaluate a patient's physical, mental, and social well-being", 
                                 correct: true, 
-                                explanation: "Health assessment involves a structured approach to understanding the overall health of a patient, considering physical, mental, and social factors." 
+                                explanation: "Health assessment involves a structured approach to understanding overall health." 
                             },
                             { 
                                 text: "To diagnose specific diseases", 
                                 correct: false, 
-                                explanation: "The primary purpose is broader than just diagnosis." 
+                                explanation: "The purpose is broader than just diagnosing diseases."
                             },
                             { 
                                 text: "To focus only on physical fitness", 
                                 correct: false, 
-                                explanation: "Health assessment looks at mental and social factors too, not just physical fitness." 
+                                explanation: "Mental and social factors are considered as well."
                             },
                             { 
                                 text: "To collect data for research studies", 
                                 correct: false, 
-                                explanation: "While data can be used for research, the main goal is understanding the patient's overall health." 
+                                explanation: "While data may be used for research, that's not the main goal."
                             }
                         ],
                         shown: false
@@ -193,16 +175,31 @@
                 this.submitBtn.onclick = this.handleSubmit.bind(this);
                 this.resumeBtn.onclick = this.resumeVideo.bind(this);
 
-                // Fullscreen button event
-                this.fullscreenBtn.addEventListener('click', this.goFullscreen.bind(this));
+                // Event to detect when fullscreen changes
+                document.addEventListener('fullscreenchange', () => {
+                    // You can handle any changes needed when switching fullscreen modes if required
+                });
             }
 
             checkInteractivePoint() {
                 const currentTime = this.video.currentTime;
                 this.interactivePoints.forEach(point => {
                     if (!point.shown && Math.abs(currentTime - point.timestamp) < 0.5) {
+                        // Pause the video at the trigger time
                         this.video.pause();
-                        this.showInteractiveSlide(point);
+
+                        // If we are currently in native fullscreen of the video, we need to exit it
+                        // and then request fullscreen on the container.
+                        if (document.fullscreenElement === this.video) {
+                            document.exitFullscreen().then(() => {
+                                // Once exited, show the slide and then request fullscreen on container
+                                this.showInteractiveSlide(point);
+                                this.requestContainerFullscreen();
+                            });
+                        } else {
+                            // If not in fullscreen or fullscreen not triggered by video element
+                            this.showInteractiveSlide(point);
+                        }
                     }
                 });
             }
@@ -262,14 +259,14 @@
                 this.video.play();
             }
 
-            goFullscreen() {
+            requestContainerFullscreen() {
                 if (this.videoContainer.requestFullscreen) {
                     this.videoContainer.requestFullscreen();
-                } else if (this.videoContainer.webkitRequestFullscreen) { // Safari
+                } else if (this.videoContainer.webkitRequestFullscreen) {
                     this.videoContainer.webkitRequestFullscreen();
-                } else if (this.videoContainer.mozRequestFullScreen) { // Firefox
+                } else if (this.videoContainer.mozRequestFullScreen) {
                     this.videoContainer.mozRequestFullScreen();
-                } else if (this.videoContainer.msRequestFullscreen) { // IE/Edge
+                } else if (this.videoContainer.msRequestFullscreen) {
                     this.videoContainer.msRequestFullscreen();
                 }
             }
@@ -278,6 +275,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             new InteractiveVideoHandler();
         });
+    </script>
+</body>
+</html>
+
     </script>
 </body>
 </html>
