@@ -11,7 +11,6 @@
             padding: 20px;
             color: #333;
         }
-
         #video-container {
             position: relative;
             max-width: 800px;
@@ -21,18 +20,14 @@
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-
-        /* When the container is fullscreen, overlay can still display */
         #video-container:fullscreen #interactive-overlay {
             display: flex;
         }
-
         #interactive-video {
             display: block;
             width: 100%;
             border-bottom: 1px solid #ddd;
         }
-
         #interactive-overlay {
             position: absolute;
             top: 0;
@@ -46,7 +41,6 @@
             align-items: center;
             z-index: 10;
         }
-
         .slide {
             background: white;
             padding: 30px;
@@ -55,29 +49,24 @@
             max-width: 90%;
             width: 100%;
         }
-
         #question-slide h2,
         #feedback-slide h2 {
             margin-top: 0;
             font-size: 1.5em;
             color: #333;
         }
-
         .choice-container {
             display: flex;
             align-items: center;
             margin: 15px 0;
         }
-
         .choice-container input[type="radio"] {
             margin-right: 10px;
         }
-
         .choice-container label {
             font-size: 1em;
             cursor: pointer;
         }
-
         #submit-btn, #resume-btn {
             margin-top: 20px;
             padding: 12px 24px;
@@ -88,12 +77,10 @@
             cursor: pointer;
             font-size: 1em;
         }
-
         #submit-btn:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
         }
-
         #feedback-slide p {
             margin: 10px 0;
         }
@@ -102,7 +89,7 @@
 <body>
     <div id="video-container">
         <video id="interactive-video" controls>
-            <source src="Medanta1.mp4" type="video/mp4">
+            <source src="SAM_Closed Suctioning Procedure.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
 
@@ -125,7 +112,6 @@
     <script>
         class InteractiveVideoHandler {
             constructor() {
-                // Elements
                 this.video = document.getElementById('interactive-video');
                 this.videoContainer = document.getElementById('video-container');
                 this.interactiveOverlay = document.getElementById('interactive-overlay');
@@ -138,32 +124,74 @@
                 this.correctAnswerText = document.getElementById('correct-answer-text');
                 this.explanationText = document.getElementById('explanation-text');
 
-                // Interactive point
                 this.interactivePoints = [
                     {
-                        timestamp: 153,
-                        question: "What is the primary purpose of a health assessment in healthcare?",
+                        timestamp: 79,
+                        question: "MICU-SUC-CQ01 - Tracheal secretions be suctioned only through an endotracheal tube",
                         choices: [
                             { 
-                                text: "To systematically evaluate a patient's physical, mental, and social well-being", 
+                                text: "True", 
+                                correct: false, 
+                                explanation: "Tracheal secretions can also be suctioned through a tracheostomy tube, which is another artificial airway. Additionally, nasotracheal suctioning is possible for patients without an endotracheal or tracheostomy tube, provided proper technique and equipment are used to ensure safety and effectiveness." 
+                            },
+                            { 
+                                text: "False", 
                                 correct: true, 
-                                explanation: "Health assessment involves a structured approach to understanding overall health." 
+                                explanation: "Tracheal secretions can also be suctioned through a tracheostomy tube, which is another artificial airway. Additionally, nasotracheal suctioning is possible for patients without an endotracheal or tracheostomy tube, provided proper technique and equipment are used to ensure safety and effectiveness."
+                            },
+                            
+                        ],
+                        shown: false
+                    },
+                    {
+                        timestamp: 174,
+                        question: "MICU-SUC-CQ02 - Is there a need to explain the procedure of suctioning to an unconscious patient?",
+                        choices: [
+                            { 
+                                text: "Yes", 
+                                correct: true, 
+                                explanation: "Even if a patient is unconscious, explaining the procedure is essential to maintain dignity and respect. It helps establish a therapeutic environment, reduces anxiety if the patient has partial awareness, and ensures caregivers are mindful of the patient's needs and comfort during the procedure."
                             },
                             { 
-                                text: "To diagnose specific diseases", 
+                                text: "No", 
                                 correct: false, 
-                                explanation: "The purpose is broader than just diagnosing diseases."
+                                explanation: "Even if a patient is unconscious, explaining the procedure is essential to maintain dignity and respect. It helps establish a therapeutic environment, reduces anxiety if the patient has partial awareness, and ensures caregivers are mindful of the patient's needs and comfort during the procedure."
+                            },
+                            
+                        ],
+                        shown: false
+                    },{
+                        timestamp: 282,
+                        question: "Ventilator patients should be given a semi-Fowler's position unless there is a contraindication.",
+                        choices: [
+                            { 
+                                text: "True", 
+                                correct: true, 
+                                explanation: "Semi-Fowler's position (head elevated at 30-45 degrees) helps improve lung expansion, promotes better oxygenation, and reduces the risk of ventilator-associated pneumonia by minimizing the chance of aspiration. It is the preferred position unless contraindicated by specific medical conditions."
                             },
                             { 
-                                text: "To focus only on physical fitness", 
+                                text: "False", 
                                 correct: false, 
-                                explanation: "Mental and social factors are considered as well."
+                                explanation: "Semi-Fowler's position (head elevated at 30-45 degrees) helps improve lung expansion, promotes better oxygenation, and reduces the risk of ventilator-associated pneumonia by minimizing the chance of aspiration. It is the preferred position unless contraindicated by specific medical conditions."
+                            },
+                            
+                        ],
+                        shown: false
+                    },{
+                        timestamp: 638,
+                        question: "MICU-SUC-CQ04 - Cuff pressure should only be checked after suctioning.",
+                        choices: [
+                            { 
+                                text: "True", 
+                                correct: false, 
+                                explanation: "Cuff pressure should be checked regularly, not only after suctioning. Maintaining appropriate cuff pressure (20-30 cm H₂O or 22- 32 cm of H2O) is essential to prevent air leaks, reduce the risk of aspiration, and avoid tracheal damage. Suctioning can alter cuff pressure, but routine monitoring is necessary to ensure patient safety."
                             },
                             { 
-                                text: "To collect data for research studies", 
-                                correct: false, 
-                                explanation: "While data may be used for research, that's not the main goal."
-                            }
+                                text: "False", 
+                                correct: true, 
+                                explanation: "Cuff pressure should be checked regularly, not only after suctioning. Maintaining appropriate cuff pressure (20-30 cm H₂O or 22- 32 cm of H2O) is essential to prevent air leaks, reduce the risk of aspiration, and avoid tracheal damage. Suctioning can alter cuff pressure, but routine monitoring is necessary to ensure patient safety."
+                            },
+                            
                         ],
                         shown: false
                     }
@@ -174,30 +202,22 @@
 
                 this.submitBtn.onclick = this.handleSubmit.bind(this);
                 this.resumeBtn.onclick = this.resumeVideo.bind(this);
-
-                // Event to detect when fullscreen changes
-                document.addEventListener('fullscreenchange', () => {
-                    // You can handle any changes needed when switching fullscreen modes if required
-                });
             }
 
             checkInteractivePoint() {
                 const currentTime = this.video.currentTime;
                 this.interactivePoints.forEach(point => {
-                    if (!point.shown && Math.abs(currentTime - point.timestamp) < 0.5) {
-                        // Pause the video at the trigger time
+                    // Trigger as soon as we pass the timestamp, no time window
+                    if (!point.shown && currentTime >= point.timestamp) {
+                        console.log(`Triggering question at ${point.timestamp}, currentTime: ${currentTime}`);
                         this.video.pause();
 
-                        // If we are currently in native fullscreen of the video, we need to exit it
-                        // and then request fullscreen on the container.
                         if (document.fullscreenElement === this.video) {
                             document.exitFullscreen().then(() => {
-                                // Once exited, show the slide and then request fullscreen on container
                                 this.showInteractiveSlide(point);
                                 this.requestContainerFullscreen();
                             });
                         } else {
-                            // If not in fullscreen or fullscreen not triggered by video element
                             this.showInteractiveSlide(point);
                         }
                     }
