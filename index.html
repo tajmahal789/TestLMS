@@ -2,118 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Interactive Video</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Vimeo Video</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-        #video-container {
+        /* Ensure the Vimeo video is responsive */
+        #vimeo-container {
+            padding: 56.25% 0 0 0;
             position: relative;
-            max-width: 800px;
-            margin: 40px auto;
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        #video-container:fullscreen #interactive-overlay {
-            display: flex;
-        }
-        #interactive-video {
-            display: block;
-            width: 100%;
-            border-bottom: 1px solid #ddd;
-        }
-        #interactive-overlay {
+        #vimeo-player {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255,255,255,0.95);
-            display: none;
+        }
+
+        /* Styling the overlay */
+        #interactive-overlay {
+            display: none; /* Hidden by default */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10;
         }
-        .slide {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-width: 90%;
-            width: 100%;
-        }
-        #question-slide h2,
-        #feedback-slide h2 {
-            margin-top: 0;
-            font-size: 1.5em;
-            color: #333;
-        }
+
         .choice-container {
-            display: flex;
-            align-items: center;
-            margin: 15px 0;
+            margin: 5px 0;
         }
-        .choice-container input[type="radio"] {
-            margin-right: 10px;
-        }
-        .choice-container label {
-            font-size: 1em;
-            cursor: pointer;
-        }
-        #submit-btn, #resume-btn {
-            margin-top: 20px;
-            padding: 12px 24px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        #submit-btn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        #feedback-slide p {
-            margin: 10px 0;
+
+        button {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div id="video-container">
-        <video id="interactive-video" controls>
-            <source src="https://youtu.be/KkjAveGA7GA" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+    <!-- Vimeo Video Embed -->
+    <div id="vimeo-container">
+        <iframe
+            id="vimeo-player"
+            src="https://player.vimeo.com/video/1048608415?h=9123a78064&amp;title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+            frameborder="0"
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+            title="1_Hand Hygiene_Video">
+        </iframe>
+    </div>
 
-        <div id="interactive-overlay">
-            <div id="question-slide" class="slide">
-                <h2 id="question-title">Question</h2>
-                <div id="choices-container"></div>
-                <button id="submit-btn" disabled>Submit</button>
-            </div>
-
-            <div id="feedback-slide" class="slide" style="display:none;">
-                <h2>Correct Answer</h2>
-                <p id="correct-answer-text"></p>
-                <p id="explanation-text"></p>
-                <button id="resume-btn">Resume Video</button>
-            </div>
+    <!-- Interactive Overlay -->
+    <div id="interactive-overlay">
+        <!-- Question Slide -->
+        <div id="question-slide">
+            <h2 id="question-title"></h2>
+            <div id="choices-container"></div>
+            <button id="submit-btn" disabled>Submit</button>
+        </div>
+        <!-- Feedback Slide -->
+        <div id="feedback-slide" style="display: none;">
+            <p id="correct-answer-text"></p>
+            <p id="explanation-text"></p>
+            <button id="resume-btn">Resume</button>
         </div>
     </div>
 
+    <!-- Vimeo Player API -->
+    <script src="https://player.vimeo.com/api/player.js"></script>
     <script>
-        class InteractiveVideoHandler {
+        // Initialize Vimeo Player using the API
+        const iframe = document.getElementById('vimeo-player');
+        const player = new Vimeo.Player(iframe);
+
+        class InteractiveVimeoHandler {
             constructor() {
-                this.video = document.getElementById('interactive-video');
-                this.videoContainer = document.getElementById('video-container');
+                this.player = player;
                 this.interactiveOverlay = document.getElementById('interactive-overlay');
                 this.questionSlide = document.getElementById('question-slide');
                 this.feedbackSlide = document.getElementById('feedback-slide');
@@ -124,131 +92,76 @@
                 this.correctAnswerText = document.getElementById('correct-answer-text');
                 this.explanationText = document.getElementById('explanation-text');
 
+                // Ensure the overlay is hidden on load
+                this.interactiveOverlay.style.display = 'none';
+
+                // Interactive Points
                 this.interactivePoints = [
                     {
-                        timestamp: 75,
-                        question: "MICU-SUC-CQ01 - Tracheal secretions be suctioned only through an endotracheal tube",
+                        timestamp: 69,
+                        question: "1. Out of the following select the appropriate moments of hand hygiene.",
                         choices: [
-                            { 
-                                text: "True", 
-                                correct: false, 
-                                explanation: "Tracheal secretions can also be suctioned through a tracheostomy tube, which is another artificial airway. Additionally, nasotracheal suctioning is possible for patients without an endotracheal or tracheostomy tube, provided proper technique and equipment are used to ensure safety and effectiveness." 
-                            },
-                            { 
-                                text: "False", 
-                                correct: true, 
-                                explanation: "Tracheal secretions can also be suctioned through a tracheostomy tube, which is another artificial airway. Additionally, nasotracheal suctioning is possible for patients without an endotracheal or tracheostomy tube, provided proper technique and equipment are used to ensure safety and effectiveness."
-                            },
-                            
+                            { text: "Before touching patient", correct: true, explanation: "" },
+                            { text: "After touching patient", correct: true, explanation: "" },
+                            { text: "Before aseptic procedures", correct: true, explanation: "" },
+                            { text: "Before body fluid exposure", correct: true, explanation: "" },
+                            { text: "After touching patient surrounding", correct: true, explanation: "" },
+                            { text: "After body fluid exposure", correct: true, explanation: "" }
                         ],
                         shown: false
                     },
                     {
-                        timestamp: 158,
-                        question: "MICU-SUC-CQ02 - Is there a need to explain the procedure of suctioning to an unconscious patient?",
+                        timestamp: 346,
+                        question: "2.Surgical hand washing with antimicrobial agent will be done for ",
                         choices: [
-                            { 
-                                text: "Yes", 
-                                correct: true, 
-                                explanation: "Even if a patient is unconscious, explaining the procedure is essential to maintain dignity and respect. It helps establish a therapeutic environment, reduces anxiety if the patient has partial awareness, and ensures caregivers are mindful of the patient's needs and comfort during the procedure."
-                            },
-                            { 
-                                text: "No", 
-                                correct: false, 
-                                explanation: "Even if a patient is unconscious, explaining the procedure is essential to maintain dignity and respect. It helps establish a therapeutic environment, reduces anxiety if the patient has partial awareness, and ensures caregivers are mindful of the patient's needs and comfort during the procedure."
-                            },
-                            
-                        ],
-                        shown: false
-                    },{
-                        timestamp: 268,
-                        question: "Ventilator patients should be given a semi-Fowler's position unless there is a contraindication.",
-                        choices: [
-                            { 
-                                text: "True", 
-                                correct: true, 
-                                explanation: "Semi-Fowler's position (head elevated at 30-45 degrees) helps improve lung expansion, promotes better oxygenation, and reduces the risk of ventilator-associated pneumonia by minimizing the chance of aspiration. It is the preferred position unless contraindicated by specific medical conditions."
-                            },
-                            { 
-                                text: "False", 
-                                correct: false, 
-                                explanation: "Semi-Fowler's position (head elevated at 30-45 degrees) helps improve lung expansion, promotes better oxygenation, and reduces the risk of ventilator-associated pneumonia by minimizing the chance of aspiration. It is the preferred position unless contraindicated by specific medical conditions."
-                            },
-                            
-                        ],
-                        shown: false
-                    },{
-                        timestamp: 624,
-                        question: "MICU-SUC-CQ04 - Cuff pressure should only be checked after suctioning.",
-                        choices: [
-                            { 
-                                text: "True", 
-                                correct: false, 
-                                explanation: "Cuff pressure should be checked regularly, not only after suctioning. Maintaining appropriate cuff pressure (20-30 cm H₂O or 22- 32 cm of H2O) is essential to prevent air leaks, reduce the risk of aspiration, and avoid tracheal damage. Suctioning can alter cuff pressure, but routine monitoring is necessary to ensure patient safety."
-                            },
-                            { 
-                                text: "False", 
-                                correct: true, 
-                                explanation: "Cuff pressure should be checked regularly, not only after suctioning. Maintaining appropriate cuff pressure (20-30 cm H₂O or 22- 32 cm of H2O) is essential to prevent air leaks, reduce the risk of aspiration, and avoid tracheal damage. Suctioning can alter cuff pressure, but routine monitoring is necessary to ensure patient safety."
-                            },
-                            
+                            { text: "20-30 seconds", correct: false, explanation: ": Surgical hand washing with an antimicrobial agent is typically done for 5 minutes to ensure proper decontamination of the hands and forearms before a surgical procedure. This extended washing time ensures the removal of bacteria and other pathogens that could pose a risk of infection during surgery." },
+                            { text: "1.5 mins", correct: true, explanation: ": Surgical hand washing with an antimicrobial agent is typically done for 5 minutes to ensure proper decontamination of the hands and forearms before a surgical procedure. This extended washing time ensures the removal of bacteria and other pathogens that could pose a risk of infection during surgery." },
+                            { text: "5 mins", correct: false, explanation: ": Surgical hand washing with an antimicrobial agent is typically done for 5 minutes to ensure proper decontamination of the hands and forearms before a surgical procedure. This extended washing time ensures the removal of bacteria and other pathogens that could pose a risk of infection during surgery." },
+                            { text: "40-60 seconds", correct: true, explanation: ": Surgical hand washing with an antimicrobial agent is typically done for 5 minutes to ensure proper decontamination of the hands and forearms before a surgical procedure. This extended washing time ensures the removal of bacteria and other pathogens that could pose a risk of infection during surgery." },
+
                         ],
                         shown: false
                     }
                 ];
 
-                this.onTimeUpdate = this.checkInteractivePoint.bind(this);
-                this.video.addEventListener('timeupdate', this.onTimeUpdate);
-
+                // Event Listeners for Buttons
                 this.submitBtn.onclick = this.handleSubmit.bind(this);
                 this.resumeBtn.onclick = this.resumeVideo.bind(this);
+
+                // Check for interactive points during playback
+                this.player.on('timeupdate', this.checkInteractivePoint.bind(this));
             }
 
-            checkInteractivePoint() {
-                const currentTime = this.video.currentTime;
-                this.interactivePoints.forEach(point => {
-                    // Trigger as soon as we pass the timestamp, no time window
+            checkInteractivePoint(event) {
+                const currentTime = event.seconds; // Current video time in seconds
+                this.interactivePoints.forEach((point) => {
                     if (!point.shown && currentTime >= point.timestamp) {
-                        console.log(`Triggering question at ${point.timestamp}, currentTime: ${currentTime}`);
-                        this.video.pause();
-
-                        if (document.fullscreenElement === this.video) {
-                            document.exitFullscreen().then(() => {
-                                this.showInteractiveSlide(point);
-                                this.requestContainerFullscreen();
-                            });
-                        } else {
-                            this.showInteractiveSlide(point);
-                        }
+                        console.log("Triggering question at:", point.timestamp);
+                        this.player.pause().then(() => this.showInteractiveSlide(point));
                     }
                 });
             }
 
             showInteractiveSlide(point) {
-                this.interactiveOverlay.style.display = 'flex';
+                this.interactiveOverlay.style.display = 'flex'; // Show overlay
                 this.questionSlide.style.display = 'block';
                 this.feedbackSlide.style.display = 'none';
-                
                 this.choicesContainer.innerHTML = '';
                 this.questionTitle.textContent = point.question;
                 this.submitBtn.disabled = true;
 
                 point.choices.forEach((choice, index) => {
                     const choiceContainer = document.createElement('div');
-                    choiceContainer.classList.add('choice-container');
-
                     const radio = document.createElement('input');
                     radio.type = 'radio';
                     radio.id = `choice-${index}`;
                     radio.name = 'answer-choice';
-
                     const label = document.createElement('label');
                     label.htmlFor = `choice-${index}`;
                     label.textContent = choice.text;
 
                     radio.addEventListener('change', () => {
-                        const checkedRadio = this.choicesContainer.querySelector('input[type=radio]:checked');
-                        this.submitBtn.disabled = !checkedRadio;
+                        this.submitBtn.disabled = false;
                     });
 
                     choiceContainer.appendChild(radio);
@@ -261,44 +174,31 @@
 
             handleSubmit() {
                 const selectedChoice = this.choicesContainer.querySelector('input[type=radio]:checked');
-                const currentPoint = this.interactivePoints.find(point => 
-                    point.question === this.questionTitle.textContent
-                );
+                if (!selectedChoice) {
+                    alert("Please select an answer.");
+                    return;
+                }
 
-                const correctChoice = currentPoint.choices.find(choice => choice.correct);
+                const currentPoint = this.interactivePoints.find((point) => point.question === this.questionTitle.textContent);
+                const correctChoice = currentPoint.choices.find((choice) => choice.correct);
 
                 this.questionSlide.style.display = 'none';
                 this.feedbackSlide.style.display = 'block';
+
                 this.correctAnswerText.textContent = `Correct Answer: ${correctChoice.text}`;
                 this.explanationText.textContent = correctChoice.explanation;
             }
 
             resumeVideo() {
-                this.interactiveOverlay.style.display = 'none';
-                this.video.currentTime += 0.6;
-                this.video.play();
-            }
-
-            requestContainerFullscreen() {
-                if (this.videoContainer.requestFullscreen) {
-                    this.videoContainer.requestFullscreen();
-                } else if (this.videoContainer.webkitRequestFullscreen) {
-                    this.videoContainer.webkitRequestFullscreen();
-                } else if (this.videoContainer.mozRequestFullScreen) {
-                    this.videoContainer.mozRequestFullScreen();
-                } else if (this.videoContainer.msRequestFullscreen) {
-                    this.videoContainer.msRequestFullscreen();
-                }
+                this.interactiveOverlay.style.display = 'none'; // Hide overlay
+                this.player.play();
             }
         }
 
+        // Initialize the Interactive Vimeo Handler
         document.addEventListener('DOMContentLoaded', () => {
-            new InteractiveVideoHandler();
+            new InteractiveVimeoHandler();
         });
-    </script>
-</body>
-</html>
-
     </script>
 </body>
 </html>
